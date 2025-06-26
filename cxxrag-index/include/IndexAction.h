@@ -29,6 +29,7 @@ namespace cxxrag {
       clang::ASTContext &ctx;
       std::vector<CodeChunk> &chunks;
 
+      [[nodiscard]]
       std::string getSourceText(clang::SourceRange range) const;
 
     public:
@@ -40,18 +41,20 @@ namespace cxxrag {
     };
 
     class ASTConsumer final : public clang::ASTConsumer {
-      std::vector<CodeChunk> chunks;
       ASTVisitor visitor;
       std::string in_file;
 
     public:
-      explicit ASTConsumer(clang::ASTContext &ctx, llvm::StringRef in_file);
-      ~ASTConsumer() override;
+      explicit ASTConsumer(std::vector<CodeChunk> &chunks, clang::ASTContext &ctx, llvm::StringRef in_file);
 
       void HandleTranslationUnit(clang::ASTContext &ctx) override;
     };
 
+    std::vector<CodeChunk> chunks;
+
   public:
+    ~IndexAction() override;
+
     std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(
       clang::CompilerInstance &cc, llvm::StringRef file) override;
   };

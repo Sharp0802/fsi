@@ -131,7 +131,7 @@ namespace cxxrag {
       .end_line = sm.getSpellingLineNumber(decl->getEndLoc()),
       .signature = getSourceText(decl->getSourceRange()),
       .body = getSourceText(decl->getSourceRange())
-  };
+    };
 
     Encode(chunk.signature);
     Encode(chunk.body);
@@ -166,7 +166,7 @@ namespace cxxrag {
       .end_line = sm.getSpellingLineNumber(decl->getEndLoc()),
       .signature = getSourceText(decl->getSourceRange()),
       .body = getSourceText(decl->getSourceRange())
-  };
+    };
 
     Encode(chunk.signature);
     Encode(chunk.body);
@@ -180,25 +180,27 @@ namespace cxxrag {
     return true;
   }
 
-  IndexAction::ASTConsumer::ASTConsumer(clang::ASTContext &ctx, llvm::StringRef in_file): visitor(ctx, chunks),
+  IndexAction::ASTConsumer::ASTConsumer(
+    std::vector<CodeChunk> &chunks, clang::ASTContext &ctx, llvm::StringRef in_file):
+    visitor(ctx, chunks),
     in_file(in_file) {
   }
 
   std::mutex Mutex;
   std::vector<CodeChunk> Chunks{};
 
-  IndexAction::ASTConsumer::~ASTConsumer() {
-    std::scoped_lock lock(Mutex);
-    std::ranges::copy(chunks, std::back_inserter(Chunks));
-  }
-
   void IndexAction::ASTConsumer::HandleTranslationUnit(clang::ASTContext &ctx) {
     visitor.TraverseDecl(ctx.getTranslationUnitDecl());
   }
 
+  IndexAction::~IndexAction() {
+    std::scoped_lock lock(Mutex);
+    std::ranges::copy(chunks, std::back_inserter(Chunks));
+  }
+
   std::unique_ptr<clang::ASTConsumer> IndexAction::CreateASTConsumer(
     clang::CompilerInstance &cc, llvm::StringRef file) {
-    return std::make_unique<ASTConsumer>(cc.getASTContext(), file);
+    return std::make_unique<ASTConsumer>(chunks, cc.getASTContext(), file);
   }
 
   const std::vector<CodeChunk> &GetChunks() {
