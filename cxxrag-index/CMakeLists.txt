@@ -1,10 +1,6 @@
-cmake_minimum_required(VERSION 4.0)
 project(cxxrag)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-
 set(CMAKE_CXX_STANDARD 26)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 include(UseClang)
