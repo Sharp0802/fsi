@@ -1,4 +1,4 @@
-project(cxxrag)
+project(cxxrag-index)
 
 set(CMAKE_CXX_STANDARD 26)
 
@@ -9,11 +9,11 @@ include(UseLLVM)
 file(GLOB_RECURSE HEADERS include/*)
 file(GLOB_RECURSE SOURCES lib/*)
 
-add_executable(cxxrag ${HEADERS} ${SOURCES})
-target_include_directories(cxxrag PUBLIC include)
-target_link_libraries(cxxrag PUBLIC
+add_executable(cxxrag-index ${HEADERS} ${SOURCES})
+target_include_directories(cxxrag-index PUBLIC include)
+target_link_libraries(cxxrag-index PUBLIC
         clang-cpp
 )
-target_precompile_headers(cxxrag PRIVATE include/Include.h)
-target_compile_options(cxxrag PUBLIC -fopenmp=libomp)
-target_link_options(cxxrag PUBLIC -fopenmp=libomp)
+target_precompile_headers(cxxrag-index PRIVATE include/Include.h)
+target_compile_options(cxxrag-index PUBLIC -fopenmp=libomp)
+target_link_options(cxxrag-index PUBLIC -fopenmp=libomp)
