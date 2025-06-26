@@ -50,14 +50,14 @@ namespace cxxrag {
   std::string CodeChunk::str() const {
     std::stringstream ss;
     ss << "\t{\n";
-    ss << "\t\tkind: \"" << static_cast<int>(kind) << "\",\n";
-    ss << "\t\tname: \"" << name << "\",\n";
-    ss << "\t\tfilepath: \"" << filepath << "\",\n";
-    ss << "\t\tstart_line: " << start_line << ",\n";
-    ss << "\t\tend_line: " << end_line << ",\n";
-    ss << "\t\tsignature: \"" << signature << "\",\n";
-    ss << "\t\tcomment: \"" << comment << "\",\n";
-    ss << "\t\tbody: \"" << body << "\"\n";
+    ss << "\t\t\"kind\": " << static_cast<int>(kind) << ",\n";
+    ss << "\t\t\"name\": \"" << name << "\",\n";
+    ss << "\t\t\"filepath\": \"" << filepath << "\",\n";
+    ss << "\t\t\"start_line\": " << start_line << ",\n";
+    ss << "\t\t\"end_line\": " << end_line << ",\n";
+    ss << "\t\t\"signature\": \"" << signature << "\",\n";
+    ss << "\t\t\"comment\": \"" << comment << "\",\n";
+    ss << "\t\t\"body\": \"" << body << "\"\n";
     ss << "\t}";
     return ss.str();
   }

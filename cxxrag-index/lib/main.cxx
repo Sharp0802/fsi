@@ -111,7 +111,7 @@ int main(int argc, const char *argv[]) {
 
     {
       std::scoped_lock lock(mutex);
-      outs() << "[" << (offset + chunk.size()) << "/" << files.size() << "] chunk load" << '\n';
+      errs() << "[" << (offset + chunk.size()) << "/" << files.size() << "] chunk load" << '\n';
       offset += chunk.size();
     }
 
