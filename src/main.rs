@@ -178,11 +178,13 @@ async fn index(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
                 eprintln!("[!] {}: {}", lossy_line, err);
                 continue;
             }
-            
-            let payload = GenerateEmbeddingsRequest::new(
-                EMBEDDING_MODEL.to_string(),
-                EmbeddingsInput::Single(content.into())
-            );
+
+            let mut map: HashMap<String, Value> = HashMap::new();
+            map.insert("path".into(), json!(lossy_line));
+            map.insert("line".into(), json!(0));
+            meta.push(map);
+
+            docs.push(content);
         }
 
         if meta.len() >= 512 {
