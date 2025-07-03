@@ -1,5 +1,5 @@
 [package]
-name = "cxxrag"
+name = "fsi"
 version = "0.1.0"
 edition = "2024"
 
@@ -13,3 +13,4 @@ ollama-rs = "0.3"
 tree-sitter = "0.25"
 tree-sitter-cpp = "0.23"
 tree-sitter-c = "0.24"
+
