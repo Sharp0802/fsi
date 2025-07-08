@@ -187,11 +187,12 @@ async fn index(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
         if meta.len() >= 512 {
             eprintln!("[*] sending chunk ({})", meta.len());
 
-            add(&ollama, &collection, offset, docs.clone(), meta.clone()).await?;
-            offset += meta.len();
-
-            docs.clear();
-            meta.clear();
+            let docs_take = std::mem::take(&mut docs);
+            let meta_take = std::mem::take(&mut meta);
+            let size = meta_take.len();
+            
+            add(&ollama, &collection, offset, docs_take, meta_take).await?;
+            offset += size;
         }
     }
 
