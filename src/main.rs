@@ -58,10 +58,6 @@ async fn add(
     Ok(())
 }
 
-fn get_line(text: &[u8], offset: usize) -> usize {
-    text[..=offset].iter().filter(|&&c| c == b'\n').count()
-}
-
 fn walk_tree(
     path: &str,
     node: Node,
@@ -89,11 +85,12 @@ fn walk_tree(
     let content = String::from_utf8_lossy(&text[node.byte_range()]);
     docs.push(content.into());
 
+    
     let mut map: HashMap<String, Value> = HashMap::new();
     map.insert("path".into(), json!(path));
     map.insert(
         "line".into(),
-        json!(get_line(text, node.byte_range().start)),
+        json!(node.start_position().row + 1),
     );
     meta.push(map);
 }
