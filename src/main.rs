@@ -5,14 +5,14 @@ use khroma::models::{
     QueryRequestPayload,
 };
 use khroma::{Collection, Khroma, KhromaError};
-use ollama_rs::Ollama;
 use ollama_rs::generation::embeddings::request::{EmbeddingsInput, GenerateEmbeddingsRequest};
+use ollama_rs::Ollama;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
 use std::env;
-use std::io::{Read, stdin};
+use std::io::{stdin, Read};
 use std::path::PathBuf;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
@@ -85,13 +85,9 @@ fn walk_tree(
     let content = String::from_utf8_lossy(&text[node.byte_range()]);
     docs.push(content.into());
 
-    
     let mut map: HashMap<String, Value> = HashMap::new();
     map.insert("path".into(), json!(path));
-    map.insert(
-        "line".into(),
-        json!(node.start_position().row + 1),
-    );
+    map.insert("line".into(), json!(node.start_position().row + 1));
     meta.push(map);
 }
 
@@ -138,9 +134,8 @@ async fn index(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
                 None
             }
         };
-        
-        if let Some(language) = language {
 
+        if let Some(language) = language {
             let mut content: Vec<u8> = Vec::new();
             content.reserve(metadata.len() as usize);
 
@@ -148,7 +143,7 @@ async fn index(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
                 eprintln!("[!] {}: {}", lossy_line, err);
                 continue;
             }
-            
+
             let mut parser: Parser = Parser::new();
             parser
                 .set_language(&language.into())
@@ -167,10 +162,9 @@ async fn index(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
                 &mut docs,
             );
         } else {
-            
             let mut content: String = String::new();
             content.reserve(metadata.len() as usize);
-            
+
             if let Err(err) = file.read_to_string(&mut content).await {
                 eprintln!("[!] {}: {}", lossy_line, err);
                 continue;
@@ -190,7 +184,7 @@ async fn index(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
             let docs_take = std::mem::take(&mut docs);
             let meta_take = std::mem::take(&mut meta);
             let size = meta_take.len();
-            
+
             add(&ollama, &collection, offset, docs_take, meta_take).await?;
             offset += size;
         }
@@ -225,22 +219,48 @@ async fn query(ollama: &Ollama, collection: &Collection) -> Result<(), Box<dyn s
     };
     let resp = collection.query(&payload, Some(5), None).await?;
 
-    let metadatas = resp.metadatas.unwrap();
-    let documents = resp.documents.unwrap();
+    let Some(metadata) = resp.metadatas else {
+        return Err("query returned no metadata".into());
+    };
+    let Some(documents) = resp.documents else {
+        return Err("query returned no documents".into());
+    };
+
+    let Some(metadata) = metadata.last() else {
+        return Err("query returned no entry".into());
+    };
+    let Some(documents) = documents.last() else {
+        return Err("query returned no entry".into());
+    };
 
     let mut chunks: Vec<Code> = Vec::new();
-    for (meta, doc) in metadatas
-        .last()
-        .unwrap()
-        .into_iter()
-        .zip(documents.last().unwrap())
-    {
-        let meta = meta.as_ref().unwrap();
-        let doc = doc.as_ref().unwrap();
+    for (meta, doc) in metadata.into_iter().zip(documents) {
+        let Some(meta) = meta.as_ref() else {
+            eprintln!("[!] missing metadata; continue...");
+            continue;
+        };
+        let Some(doc) = doc.as_ref() else {
+            eprintln!("[!] missing document; continue...");
+            continue;
+        };
+
+        let Some(path) = meta.get("path") else {
+            eprintln!("[!] missing path in metadata; continue...");
+            continue;
+        };
+
+        let Some(line) = meta.get("line") else {
+            eprintln!("[!] missing line in metadata; continue...");
+            continue;
+        };
+        let Some(line) = line.as_u64() else {
+            eprintln!("[!] line in metadata is not integer; continue...");
+            continue;
+        };
 
         chunks.push(Code {
-            path: meta.get("path").unwrap().to_string(),
-            line: meta.get("line").unwrap().as_u64().unwrap(),
+            path: path.to_string(),
+            line,
             code: doc.to_string(),
         })
     }
