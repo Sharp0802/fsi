@@ -1,6 +1,6 @@
-# FSI : Fast Source Indexer
+# FSIX : Fast Source Indexer
 
-FSI is fast source indexer using ChromaDB, written with Rust.
+FSIX is fast source indexer using ChromaDB, written with Rust.
 
 ## Method
 
@@ -17,27 +17,27 @@ You can add a support for that language easily.
 ## Usage
 
 ```
-fsi -i
-fsi --index
-fsi -q
-fsi --query
+fsix -i
+fsix --index
+fsix -q
+fsix --query
 ```
 
 - `-i` | `--index` - Index sources
 
 Reads files from `stdin` line-by-line until EOF.
-So you can pipe files to `fsi`:
+So you can pipe files to `fsix`:
 
 ```
-find . -name '*.cxx' | fsi -i
+find . -name '*.cxx' | fsix -i
 ```
 
 - `-q` | `--query` - Query sources
 
 Read-to-end `stdin`, and use it as query.
-Same as indexing, you can also pipe query to `fsi`:
+Same as indexing, you can also pipe query to `fsix`:
 
 ```
-cat prompt.txt | fsi -q
-fsi -q < prompt.txt
+cat prompt.txt | fsix -q
+fsix -q < prompt.txt
 ```
