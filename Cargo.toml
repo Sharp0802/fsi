@@ -2,6 +2,11 @@
 name = "fsix"
 version = "0.1.0"
 edition = "2024"
+description = "FSIX is fast source indexer using ChromaDB, written with Rust"
+readme = "README.md"
+repository = "https://github.com/sharp0802/fsix"
+license = "MIT"
+keywords = ["index", "indexer", "chroma", "chromadb"]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
