@@ -1,6 +1,6 @@
 [package]
 name = "fsix"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "FSIX is fast source indexer using ChromaDB, written with Rust"
 readme = "README.md"
